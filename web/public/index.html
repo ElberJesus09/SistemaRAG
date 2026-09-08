@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Consulta los documentos institucionales y encuentra respuestas con sus fuentes."
+    />
+    <meta name="color-scheme" content="light" />
+    <title>RAG · Asistente documental</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./estilos.css" />
+    <script type="module" src="./js/aplicacion.js"></script>
+  </head>
+  <body>
+    <a class="saltar" href="#contenido">Saltar al contenido</a>
+    <div class="estructura">
+      <aside class="lateral" id="lateral" aria-label="Conversaciones">
+        <a class="marca" href="./" aria-label="RAG, inicio"
+          ><span class="isotipo" aria-hidden="true">R</span
+          ><span>RAG<small>ASISTENTE DOCUMENTAL</small></span></a
+        >
+        <button class="boton nuevo" id="nueva" type="button" disabled>
+          <span aria-hidden="true">＋</span> Nueva conversación
+        </button>
+        <div class="etiqueta-lateral">
+          TUS CONVERSACIONES
+          <button
+            id="actualizar"
+            class="icono"
+            title="Actualizar conversaciones"
+            aria-label="Actualizar conversaciones"
+            disabled
+          >
+            ↻
+          </button>
+        </div>
+        <nav id="conversaciones" class="conversaciones" aria-label="Historial">
+          <p class="ayuda-lateral">Inicia sesión para ver tu historial.</p>
+        </nav>
+        <div class="pie-lateral">
+          <span class="punto" aria-hidden="true"></span> Respuestas basadas en documentos
+        </div>
+        <button id="cuenta" class="cuenta" type="button" hidden>
+          <span class="avatar" id="iniciales">U</span
+          ><span><strong id="nombre-usuario"></strong><small>Mi cuenta</small></span
+          ><span aria-hidden="true">↗</span>
+        </button>
+      </aside>
+      <main id="contenido" class="principal">
+        <header class="cabecera">
+          <div class="cabecera-titulo">
+            <button
+              id="menu"
+              class="icono menu"
+              aria-label="Abrir conversaciones"
+              aria-expanded="false"
+              aria-controls="lateral"
+            >
+              ☰</button
+            ><span>Asistente documental</span><span class="separador">/</span
+            ><span class="secundario">Consultas</span>
+          </div>
+          <div class="acciones-cabecera">
+            <a id="administracion" href="/admin" hidden>Administración ↗</a
+            ><button id="salir" class="enlace" hidden>Cerrar sesión</button>
+          </div>
+        </header>
+        <div id="aviso" class="aviso" role="status" aria-live="polite" hidden></div>
+        <section id="acceso" class="acceso" aria-labelledby="titulo-acceso">
+          <div class="presentacion">
+            <span class="sobretexto">TU INFORMACIÓN, MÁS CERCA</span>
+            <h1>
+              Una pregunta.<br />
+              Respuestas con<br />
+              <em>fundamento.</em>
+            </h1>
+            <p>
+              Consulta los documentos institucionales, revisa las fuentes y continúa donde lo
+              dejaste.
+            </p>
+            <div class="nota-documental">
+              <span aria-hidden="true">↗</span
+              ><span
+                >Cada fuente cuenta.<small
+                  >Comprueba el documento y la página de cada respuesta.</small
+                ></span
+              >
+            </div>
+          </div>
+          <form id="formulario-acceso" class="tarjeta-acceso">
+            <span class="sobretexto">BIENVENIDO A RAG</span>
+            <h2 id="titulo-acceso">Inicia sesión</h2>
+            <p id="descripcion-acceso" class="secundario">
+              Accede a tus consultas y conversaciones.
+            </p>
+            <label id="campo-nombre" hidden
+              >Nombre completo<input
+                id="nombre"
+                name="nombre"
+                autocomplete="name"
+                minlength="2"
+                maxlength="120"
+            /></label>
+            <label
+              >Correo electrónico<input
+                id="correo"
+                name="correo"
+                type="email"
+                autocomplete="email"
+                placeholder="nombre@ejemplo.com"
+                required
+            /></label>
+            <label
+              >Contraseña<input
+                id="contrasena"
+                name="contrasena"
+                type="password"
+                autocomplete="current-password"
+                minlength="8"
+                maxlength="128"
+                required
+            /></label>
+            <button id="entrar" class="boton primario" type="submit" disabled>Conectando…</button>
+            <p class="alternar">
+              <span id="texto-alternar">¿Aún no tienes cuenta?</span>
+              <button id="alternar" class="enlace" type="button">Regístrate</button>
+            </p>
+            <p class="nota-seguridad">Tu sesión permanece abierta mientras usas esta página.</p>
+          </form>
+        </section>
+        <section id="chat" class="chat" aria-label="Conversación con el asistente" hidden>
+          <div class="barra-conversacion">
+            <div>
+              <h1 id="titulo-conversacion">Nueva conversación</h1>
+              <p id="detalle-conversacion" class="secundario">
+                Pregunta sobre los documentos disponibles.
+              </p>
+            </div>
+            <div>
+              <button id="renombrar" class="enlace" hidden>Renombrar</button
+              ><button id="eliminar" class="enlace peligro" hidden>Eliminar</button>
+            </div>
+          </div>
+          <div
+            id="mensajes"
+            class="mensajes"
+            role="log"
+            aria-live="polite"
+            aria-relevant="additions"
+            aria-label="Mensajes"
+          >
+            <div class="bienvenida">
+              <span class="sello" aria-hidden="true">R</span
+              ><span class="sobretexto">PREGUNTA. CONSULTA. COMPRUEBA.</span>
+              <h2>¿Qué necesitas saber?</h2>
+              <p>
+                Escribe una pregunta concreta. Encontraremos la información en los documentos de la
+                institución.
+              </p>
+            </div>
+          </div>
+          <form id="formulario-pregunta" class="compositor">
+            <label class="solo-lector" for="pregunta">Tu pregunta</label
+            ><textarea
+              id="pregunta"
+              name="pregunta"
+              placeholder="Escribe tu pregunta…"
+              rows="2"
+              minlength="3"
+              maxlength="2000"
+              required
+            ></textarea>
+            <div class="pie-compositor">
+              <span id="contador" class="secundario">0 / 2000</span
+              ><button id="enviar" type="submit" class="boton primario">
+                Enviar <span aria-hidden="true">↑</span>
+              </button>
+            </div>
+          </form>
+          <p class="advertencia-chat">
+            Las respuestas pueden contener errores. Verifica siempre las fuentes.
+          </p>
+        </section>
+      </main>
+    </div>
+    <dialog id="dialogo" aria-labelledby="titulo-dialogo">
+      <form id="formulario-dialogo">
+        <div class="cabecera-dialogo">
+          <h2 id="titulo-dialogo"></h2>
+          <button class="icono" id="cerrar-dialogo" type="button" aria-label="Cerrar diálogo">
+            ×
+          </button>
+        </div>
+        <div id="cuerpo-dialogo"></div>
+        <p id="error-dialogo" role="alert" class="error" hidden></p>
+        <div class="acciones-dialogo">
+          <button id="cancelar-dialogo" class="boton secundario" type="button">Cancelar</button
+          ><button id="confirmar-dialogo" class="boton primario" type="submit">Guardar</button>
+        </div>
+      </form>
+    </dialog>
+    <noscript><p class="aviso">Activa JavaScript para utilizar el asistente.</p></noscript>
+  </body>
+</html>

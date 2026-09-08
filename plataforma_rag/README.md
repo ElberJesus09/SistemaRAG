@@ -1,6 +1,6 @@
 # Plataforma RAG con Supabase y Gemini
 
-API preparada para ser consumida por Flutter. Incluye usuarios, recuperación semántica, respuestas con fuentes, carga de JSONL, panel administrativo, auditoría, métricas y alertas.
+API preparada para clientes web y móviles. Incluye usuarios, recuperación semántica, respuestas con fuentes, carga de JSONL, panel administrativo, auditoría, métricas y alertas. La web de usuarios está en `/web/`; consulta el README de la raíz para iniciar todo con `iniciar.bat`.
 
 ## Tecnologías y modelos
 
@@ -17,7 +17,7 @@ API preparada para ser consumida por Flutter. Incluye usuarios, recuperación se
 2. Abre **SQL Editor**.
 3. Ejecuta en orden los archivos de `supabase/migrations/`:
    `001_esquema_inicial.sql`, `002_permisos_api.sql`, `003_conversaciones_memoria.sql`
-   y `004_metricas_y_limites.sql`. Si el esquema ya existía, basta con ejecutar los
+   `004_metricas_y_limites.sql` y `005_usuarios_y_actividad.sql`. Si el esquema ya existía, basta con ejecutar los
    que falten; todos son idempotentes.
 4. En Authentication configura si exigirás confirmación por correo.
 5. Copia la URL, la clave `anon` y la clave `service_role` desde Project Settings > API.
@@ -33,8 +33,8 @@ La clave `service_role` omite RLS: debe existir únicamente en el servidor. No d
 ## 3. Configurar el proyecto
 
 ```powershell
-cd D:\SistemaRAG\plataforma_rag
-python -m pip install -r requirements.txt
+cd D:\Proyectos\SistemaRAG\plataforma_rag
+..\instalar.bat
 ```
 
 Completa en `.env`:
@@ -49,7 +49,7 @@ GEMINI_API_KEY=...
 ## 4. Iniciar y crear el primer administrador
 
 ```powershell
-python -m uvicorn app.main:app --reload
+.\run.bat --reload
 ```
 
 1. Registra un usuario con `POST /api/v1/auth/register` desde `http://localhost:8000/docs`.

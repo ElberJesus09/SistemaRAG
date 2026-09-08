@@ -1,0 +1,11 @@
+services:
+  sistema-rag:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    env_file:
+      - ./plataforma_rag/.env
+    environment:
+      APP_ENV: production
+      LOG_JSON: "true"
+    restart: unless-stopped

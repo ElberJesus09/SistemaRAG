@@ -23,9 +23,9 @@ El sistema que genere embeddings debe enviar **un solo `embedding_text` por soli
 Requiere Python 3.10 o posterior.
 
 ```powershell
-cd D:\SistemaRAG\transformacion
-python -m pip install -r requirements.txt
-python app.py
+cd D:\Proyectos\SistemaRAG\transformacion
+..\instalar.bat
+.\iniciar.bat
 ```
 
 También se puede abrir `iniciar.bat` con doble clic después de instalar las dependencias.

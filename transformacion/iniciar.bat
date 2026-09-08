@@ -1,19 +1,9 @@
 @echo off
+setlocal
 cd /d "%~dp0"
-where py >nul 2>&1
-if not errorlevel 1 (
-  py app.py
-  goto :check
+if exist "..\plataforma_rag\.venv\Scripts\python.exe" (
+  "..\plataforma_rag\.venv\Scripts\python.exe" "%~dp0app.py"
+  exit /b
 )
-where python >nul 2>&1
-if not errorlevel 1 (
-  python app.py
-  goto :check
-)
-echo No se encontro Python. Instala Python 3.10 o posterior.
-pause
+echo Falta el entorno virtual compartido. Ejecuta instalar.bat en la raiz del proyecto.
 exit /b 1
-
-:check
-if errorlevel 1 echo Instala las dependencias con: py -m pip install -r requirements.txt
-if errorlevel 1 pause

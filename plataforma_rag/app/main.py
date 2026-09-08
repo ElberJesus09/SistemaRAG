@@ -26,7 +26,7 @@ registro = obtener_logger("app.peticiones")
 app = FastAPI(
     title=settings.app_name,
     version="1.1.0",
-    description="API RAG para Flutter con Supabase y Gemini",
+    description="API RAG para clientes web y móviles con Supabase y Gemini",
 )
 app.add_middleware(
     CORSMiddleware,
@@ -42,6 +42,16 @@ app.mount("/static", StaticFiles(directory=static_dir), name="static")
 app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(chat.router, prefix=settings.api_prefix)
 app.include_router(admin.router, prefix=settings.api_prefix)
+
+
+@app.get("/web/configuracion.json", include_in_schema=False)
+def configuracion_web() -> dict[str, str]:
+    """Expone exclusivamente la ruta pública de la API, nunca credenciales."""
+    return {"url_api": settings.api_prefix}
+
+
+if settings.web_directory.is_dir():
+    app.mount("/web", StaticFiles(directory=settings.web_directory, html=True), name="web")
 
 
 @app.middleware("http")
@@ -84,6 +94,7 @@ async def request_context(request: Request, call_next):
 
 
 @app.get("/", include_in_schema=False)
+@app.get("/admin", include_in_schema=False)
 def dashboard() -> FileResponse:
     return FileResponse(static_dir / "index.html")
 
