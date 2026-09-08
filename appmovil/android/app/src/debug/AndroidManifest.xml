@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- La INTERNET permission la necesita la herramienta de Flutter para el
+         hot reload y los breakpoints. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Solo en depuracion: Android 9+ bloquea el trafico http:// sin cifrar, y
+         durante el desarrollo la API corre en http://10.0.2.2:8000 (emulador) o
+         en la IP de la PC (celular fisico). La compilacion de release NO lleva
+         esta marca, asi que en produccion la app exige https://. -->
+    <application android:usesCleartextTraffic="true"/>
+</manifest>

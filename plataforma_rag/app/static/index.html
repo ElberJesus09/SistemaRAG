@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="es" data-tema="">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>Panel · Plataforma RAG</title>
+  <link rel="stylesheet" href="/static/estilos.css?v=6">
+</head>
+<body>
+
+<section id="inicio-sesion" class="pantalla-acceso">
+  <form id="formulario-acceso" class="tarjeta acceso" autocomplete="on">
+    <div class="marca">RAG</div>
+    <h1>Panel administrativo</h1>
+    <p class="apoyo">Supervisa las preguntas de los estudiantes, los tiempos de respuesta y la base documental.</p>
+    <label for="correo">Correo electrónico
+      <input id="correo" type="email" required autocomplete="username" placeholder="admin@institucion.edu.pe">
+    </label>
+    <label for="contrasena">Contraseña
+      <input id="contrasena" type="password" minlength="8" required autocomplete="current-password" placeholder="Mínimo 8 caracteres">
+    </label>
+    <button type="submit" id="boton-acceso">Ingresar</button>
+    <p id="error-acceso" class="mensaje error" role="alert" aria-live="polite"></p>
+  </form>
+</section>
+
+<div id="aplicacion" class="oculto">
+  <div id="velo" class="velo"></div>
+
+  <aside id="rail">
+    <div class="logo">
+      <span>R</span>
+      <div><strong>Plataforma RAG</strong><small>Administración</small></div>
+    </div>
+    <nav aria-label="Secciones">
+      <button class="navegacion activo" data-seccion="resumen">Resumen</button>
+      <button class="navegacion" data-seccion="pruebas">Probar el asistente</button>
+      <button class="navegacion" data-seccion="usuarios">Usuarios <span id="contador-activos" class="insignia cero">0</span></button>
+      <button class="navegacion" data-seccion="documentos">Documentos</button>
+      <button class="navegacion" data-seccion="alertas">Alertas <span id="contador-alertas" class="insignia cero">0</span></button>
+      <button class="navegacion" data-seccion="auditoria">Auditoría</button>
+    </nav>
+    <div class="pie-rail">
+      <div class="usuario">
+        <div class="avatar" id="avatar">—</div>
+        <div><strong id="nombre-usuario">Administrador</strong><small id="correo-usuario">—</small></div>
+      </div>
+      <button id="alternar-tema" class="secundario">Modo oscuro</button>
+      <button id="cerrar-sesion" class="secundario">Cerrar sesión</button>
+    </div>
+  </aside>
+
+  <div class="columna">
+    <header class="barra">
+      <button id="abrir-menu" class="secundario icono abrir-menu" aria-label="Abrir menú">☰</button>
+      <h1 id="titulo-seccion">Resumen general</h1>
+      <div class="acciones">
+        <span id="pulso" class="pulso desconocido">Comprobando</span>
+        <label class="solo-lectores" for="periodo">Periodo</label>
+        <select id="periodo" style="width:auto">
+          <option value="7">Últimos 7 días</option>
+          <option value="30" selected>Últimos 30 días</option>
+          <option value="90">Últimos 90 días</option>
+          <option value="365">Último año</option>
+        </select>
+        <button id="actualizar" class="secundario">Actualizar</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- ---------------- Resumen ---------------- -->
+      <section id="resumen" class="seccion">
+        <div id="indicadores" class="indicadores"></div>
+
+        <div class="rejilla dos">
+          <article class="tarjeta">
+            <div class="cabecera-tarjeta">
+              <div>
+                <p class="rotulo">Rendimiento</p>
+                <h2>A dónde se va el tiempo</h2>
+              </div>
+            </div>
+            <div class="tiempos">
+              <div class="total-tiempo">
+                <strong id="tiempo-total">—</strong>
+                <span>mediana de una pregunta · <b id="tiempo-p95">—</b> en el peor 5%</span>
+              </div>
+              <div id="pila-tiempos" class="pila" role="img" aria-label="Reparto del tiempo de una pregunta"></div>
+              <div id="leyenda-tiempos" class="leyenda"></div>
+              <p class="apoyo" id="nota-tiempos"></p>
+            </div>
+          </article>
+
+          <article class="tarjeta">
+            <div class="cabecera-tarjeta">
+              <div><p class="rotulo">Intención</p><h2>Preguntas recurrentes</h2></div>
+            </div>
+            <div id="recurrentes" class="lista"></div>
+          </article>
+        </div>
+
+        <article class="tarjeta" style="margin-bottom:14px">
+          <div class="cabecera-tarjeta">
+            <div><p class="rotulo">Volumen</p><h2>Preguntas por día</h2></div>
+            <span id="total-periodo" class="metrica">—</span>
+          </div>
+          <div class="marco-grafico">
+            <div id="eje-y" class="eje-y"></div>
+            <div id="grafico" class="grafico"></div>
+            <div id="eje-x" class="eje-x"></div>
+          </div>
+          <div id="grafico-vacio" class="vacio oculto">
+            <span class="emoji">📊</span>
+            <strong>Todavía no hay preguntas</strong>
+            <small>Cuando los estudiantes empiecen a usar el asistente verás aquí el volumen diario.</small>
+          </div>
+        </article>
+
+        <article class="tarjeta">
+          <div class="cabecera-tarjeta">
+            <div><p class="rotulo">Actividad</p><h2>Preguntas recientes</h2></div>
+            <div class="acciones">
+              <div class="buscador">
+                <label class="solo-lectores" for="filtro-preguntas">Buscar</label>
+                <input id="filtro-preguntas" type="search" placeholder="Buscar en las preguntas...">
+              </div>
+            </div>
+          </div>
+          <div class="contenedor-tabla">
+            <table>
+              <thead><tr>
+                <th>Pregunta</th><th>Estado</th><th>Total</th><th>Búsqueda</th><th>Generación</th><th>Similitud</th><th>Fecha</th>
+              </tr></thead>
+              <tbody id="tabla-preguntas"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ---------------- Probar ---------------- -->
+      <section id="pruebas" class="seccion oculto">
+        <div class="rejilla prueba">
+          <form id="formulario-prueba" class="tarjeta">
+            <p class="rotulo">Consulta</p>
+            <h2>Hacer una pregunta</h2>
+            <p class="apoyo" style="margin:4px 0 14px">Usa el mismo endpoint que consume la app móvil.</p>
+            <label for="pregunta">Pregunta
+              <textarea id="pregunta" rows="5" minlength="3" maxlength="2000" required
+                placeholder="Ejemplo: ¿Cuánto cuesta el trámite para obtener el grado de bachiller?"></textarea>
+            </label>
+            <label class="interruptor">
+              <input id="mantener-chat" type="checkbox">
+              <span>Mantener la conversación</span>
+            </label>
+            <p class="apoyo" id="estado-chat" style="margin:2px 0 12px"></p>
+            <div class="ejemplos">
+              <button type="button" class="secundario ejemplo" data-pregunta="¿Cuánto cuesta el trámite para obtener el grado de bachiller?">Costo de bachiller</button>
+              <button type="button" class="secundario ejemplo" data-pregunta="¿A qué correo envío los documentos para acreditar inglés?">Correo para inglés</button>
+              <button type="button" class="secundario ejemplo" data-pregunta="¿Qué requisitos necesito para la matrícula?">Requisitos de matrícula</button>
+            </div>
+            <button id="boton-probar" type="submit" style="width:100%">Consultar al RAG</button>
+            <p id="estado-prueba" class="mensaje" aria-live="polite"></p>
+          </form>
+
+          <article id="resultado" class="tarjeta oculto">
+            <div class="cabecera-tarjeta">
+              <div><p class="rotulo">Respuesta</p><h2>Lo que ve el estudiante</h2></div>
+              <button id="ver-crudo" class="fantasma" type="button">Ver texto crudo</button>
+            </div>
+            <div id="texto-respuesta" class="respuesta"></div>
+            <div id="metricas" class="metricas"></div>
+            <div id="desglose-prueba" class="tiempos oculto" style="margin-bottom:18px">
+              <div id="pila-prueba" class="pila" role="img" aria-label="Reparto del tiempo"></div>
+              <div id="leyenda-prueba" class="leyenda"></div>
+            </div>
+            <h2 style="margin-bottom:6px">Fuentes recuperadas</h2>
+            <p class="apoyo" style="margin-bottom:11px">Toca una fuente para leer el fragmento exacto que recibió el modelo.</p>
+            <div id="fuentes"></div>
+          </article>
+        </div>
+
+        <article class="tarjeta" id="tarjeta-historial" style="margin-top:14px">
+          <div class="cabecera-tarjeta">
+            <div><p class="rotulo">Sesión</p><h2>Pruebas de esta sesión</h2></div>
+            <button id="limpiar-historial" class="fantasma" type="button">Limpiar</button>
+          </div>
+          <div id="historial-pruebas" class="lista"></div>
+        </article>
+      </section>
+
+      <!-- ---------------- Usuarios ---------------- -->
+      <section id="usuarios" class="seccion oculto">
+        <article class="tarjeta">
+          <div class="cabecera-tarjeta">
+            <div>
+              <p class="rotulo">Comunidad</p>
+              <h2>Quién usa el asistente</h2>
+              <p class="apoyo" style="margin-top:4px">
+                Una API REST no mantiene sesión abierta, así que nadie aparece
+                literalmente “conectado”. Lo que sí se puede medir es quién
+                preguntó algo hace poco y cuándo inició sesión por última vez.
+              </p>
+            </div>
+            <div class="acciones">
+              <label class="solo-lectores" for="ventana-activos">Ventana</label>
+              <select id="ventana-activos" style="width:auto">
+                <option value="15" selected>Activos: 15 min</option>
+                <option value="60">Activos: 1 hora</option>
+                <option value="1440">Activos: 24 horas</option>
+              </select>
+              <div class="buscador">
+                <label class="solo-lectores" for="filtro-usuarios">Buscar</label>
+                <input id="filtro-usuarios" type="search" placeholder="Nombre o correo...">
+              </div>
+            </div>
+          </div>
+          <div class="contenedor-tabla">
+            <table class="tabla-ancha">
+              <thead><tr>
+                <th>Usuario</th><th>Cuenta</th><th>Preguntas</th>
+                <th>Valoraciones</th><th>Actividad</th>
+                <th class="celda-acciones">Acciones</th>
+              </tr></thead>
+              <tbody id="tabla-usuarios"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ---------------- Documentos ---------------- -->
+      <section id="documentos" class="seccion oculto">
+        <div class="rejilla dos">
+          <form id="formulario-carga" class="tarjeta">
+            <p class="rotulo">Ingesta</p>
+            <h2>Cargar chunks</h2>
+            <p class="apoyo" style="margin:4px 0 14px">
+              Selecciona el archivo <strong>.chunks.jsonl</strong> creado por Transformación.
+              El <strong>manifest.json</strong> no se carga.
+            </p>
+            <label for="archivo" class="zona" id="zona">
+              <span class="emoji">📄</span>
+              <strong id="texto-archivo">Arrastra el archivo o haz clic para elegirlo</strong>
+              <small>Formatos aceptados: .jsonl o .json</small>
+              <input id="archivo" type="file" accept=".jsonl,.json,application/json" required>
+            </label>
+            <button id="boton-carga" type="submit" disabled style="width:100%;margin-top:14px">
+              Generar embeddings y guardar
+            </button>
+            <div id="barra-progreso" class="progreso oculto"><div></div></div>
+            <p id="progreso-carga" class="mensaje" aria-live="polite"></p>
+          </form>
+
+          <article class="tarjeta">
+            <p class="rotulo">Configuración</p>
+            <h2 style="margin-bottom:12px">Modelos activos</h2>
+            <dl class="ficha" id="ficha-modelos"></dl>
+          </article>
+        </div>
+
+        <article class="tarjeta">
+          <div class="cabecera-tarjeta">
+            <div><p class="rotulo">Base de conocimiento</p><h2>Documentos cargados</h2></div>
+            <button id="actualizar-documentos" class="secundario">Actualizar</button>
+          </div>
+          <div class="contenedor-tabla">
+            <table>
+              <thead><tr><th>Documento</th><th>Estado</th><th>Chunks</th><th>Fecha</th></tr></thead>
+              <tbody id="tabla-documentos"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- ---------------- Alertas ---------------- -->
+      <section id="alertas" class="seccion oculto">
+        <article class="tarjeta">
+          <div class="cabecera-tarjeta">
+            <div><p class="rotulo">Supervisión</p><h2>Alertas del sistema</h2></div>
+            <div class="acciones">
+              <label class="solo-lectores" for="filtro-alertas">Estado</label>
+              <select id="filtro-alertas" style="width:auto">
+                <option value="open" selected>Abiertas</option>
+                <option value="acknowledged">En revisión</option>
+                <option value="resolved">Resueltas</option>
+                <option value="all">Todas</option>
+              </select>
+            </div>
+          </div>
+          <div id="lista-alertas" class="lista-alertas"></div>
+        </article>
+      </section>
+
+      <!-- ---------------- Auditoría ---------------- -->
+      <section id="auditoria" class="seccion oculto">
+        <article class="tarjeta">
+          <div class="cabecera-tarjeta">
+            <div><p class="rotulo">Trazabilidad</p><h2>Registro de acciones</h2></div>
+            <div class="acciones">
+              <div class="buscador">
+                <label class="solo-lectores" for="filtro-auditoria">Buscar</label>
+                <input id="filtro-auditoria" type="search" placeholder="Buscar acción o entidad...">
+              </div>
+            </div>
+          </div>
+          <div class="contenedor-tabla">
+            <table>
+              <thead><tr><th>Acción</th><th>Entidad</th><th>Detalle</th><th>Fecha</th></tr></thead>
+              <tbody id="tabla-auditoria"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+    </main>
+  </div>
+</div>
+
+<dialog id="modal">
+  <form method="dialog" class="cabecera-modal">
+    <div><p class="rotulo" id="modal-rotulo"></p><h2 id="modal-titulo"></h2></div>
+    <button class="fantasma" value="cerrar" aria-label="Cerrar">✕</button>
+  </form>
+  <div id="modal-cuerpo"></div>
+</dialog>
+
+<div id="avisos" aria-live="polite"></div>
+<script src="/static/panel.js?v=6" defer></script>
+</body>
+</html>

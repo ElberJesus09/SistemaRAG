@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "source_file": "INFORMACION-CHATBOT.pdf",
+  "document_id": "d8216560510abc03",
+  "chunk_count": 16,
+  "max_tokens": 700,
+  "overlap_tokens": 80,
+  "embedding_model": "gemini-embedding-2",
+  "output_dimensions": 768,
+  "low_text_pages": [],
+  "automatic_validation": {
+    "enabled": true,
+    "minimum_quality_score": 85,
+    "chunks_with_warnings": 1
+  },
+  "output_file": "INFORMACION-CHATBOT.chunks.jsonl"
+}
