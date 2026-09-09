@@ -19,6 +19,7 @@ class Configuracion(BaseSettings):
 
     app_name: str = "Plataforma RAG"
     app_env: str = "development"
+    login_aliases: dict[str, str] = Field(default_factory=dict)
     api_prefix: str = "/api/v1"
     # Puertos habituales de "flutter run -d chrome --web-port ...". En produccion
     # deja solo el dominio real, o sirve la app web desde esta misma API.

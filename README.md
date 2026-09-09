@@ -56,6 +56,11 @@ Las respuestas se muestran con el Markdown limitado de la API, sin ejecutar HTML
 Ante una espera agotada, se conserva el borrador: actualiza la conversación antes de
 reenviar para comprobar si el servidor ya guardó la respuesta.
 
+El panel permite también un alias configurado en `plataforma_rag/.env`, por
+ ejemplo `LOGIN_ALIASES={"usuario":"cuenta@ejemplo.com"}`. El alias utiliza la
+misma cuenta y contraseña de Supabase; sus permisos siguen dependiendo del perfil.
+Reinicia el servidor después de cambiar esta configuración.
+
 ## Pruebas
 
 ```powershell

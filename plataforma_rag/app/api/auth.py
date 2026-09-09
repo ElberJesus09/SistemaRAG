@@ -65,9 +65,9 @@ def iniciar_sesion(payload: SolicitudInicioSesion, supabase: ServicioSupabase = 
             raise HTTPException(status_code=403, detail="Debes confirmar tu correo antes de iniciar sesion") from exc
         if exc.code in {"over_request_rate_limit", "over_email_send_rate_limit"}:
             raise HTTPException(status_code=429, detail="Demasiados intentos. Espera unos minutos") from exc
-        raise HTTPException(status_code=401, detail="Correo o contrasena incorrectos") from exc
+        raise HTTPException(status_code=401, detail="Usuario, correo o contrasena incorrectos") from exc
     except Exception as exc:
-        raise HTTPException(status_code=401, detail="Correo o contrasena incorrectos") from exc
+        raise HTTPException(status_code=401, detail="Usuario, correo o contrasena incorrectos") from exc
 
 
 @router.post("/refresh", response_model=RespuestaAutenticacion)

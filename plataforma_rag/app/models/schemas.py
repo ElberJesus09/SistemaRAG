@@ -17,6 +17,17 @@ class SolicitudInicioSesion(BaseModel):
     email: EmailStr
     password: str = Field(min_length=8, max_length=128)
 
+    @field_validator("email", mode="before")
+    @classmethod
+    def resolver_alias(cls, valor: Any) -> Any:
+        from app.core.config import obtener_configuracion
+
+        if isinstance(valor, str):
+            valor = valor.strip()
+            aliases = obtener_configuracion().login_aliases
+            return aliases.get(valor.lower(), valor)
+        return valor
+
 
 class SolicitudRenovacion(BaseModel):
     refresh_token: str

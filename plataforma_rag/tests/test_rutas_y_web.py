@@ -101,3 +101,33 @@ def test_limite_de_preguntas_devuelve_429(cliente):
     respuesta = cliente.post("/api/v1/chat/ask", json={"question": "Cómo me matriculo?"})
     assert respuesta.status_code == 429
     assert respuesta.headers["retry-after"] == "600"
+
+
+@pytest.mark.parametrize("identificador", ["elber", " ELBER ", "equirozc@unprg.edu.pe"])
+def test_login_resuelve_alias_y_conserva_contrasena(cliente, monkeypatch, identificador):
+    from app.core.config import obtener_configuracion
+    monkeypatch.setattr(obtener_configuracion(), "login_aliases", {"elber": "equirozc@unprg.edu.pe"})
+    def entrar(email, password):
+        assert email == "equirozc@unprg.edu.pe"
+        assert password == "prueba123"
+        return SimpleNamespace(session=SimpleNamespace(access_token="token", refresh_token="refresh", expires_in=3600))
+    app.dependency_overrides[obtener_supabase] = lambda: SimpleNamespace(iniciar_sesion=entrar)
+    respuesta = cliente.post("/api/v1/auth/login", json={"email": identificador, "password": "prueba123"})
+    assert respuesta.status_code == 200
+    assert respuesta.json()["access_token"] == "token"
+
+
+def test_alias_no_omite_la_validacion_de_contrasena(cliente, monkeypatch):
+    from app.core.config import obtener_configuracion
+    monkeypatch.setattr(obtener_configuracion(), "login_aliases", {"elber": "equirozc@unprg.edu.pe"})
+    def entrar(email, password):
+        raise ValueError("Credenciales incorrectas")
+    app.dependency_overrides[obtener_supabase] = lambda: SimpleNamespace(iniciar_sesion=entrar)
+    assert cliente.post("/api/v1/auth/login", json={"email": "elber", "password": "incorrecta"}).status_code == 401
+    assert cliente.post("/api/v1/auth/login", json={"email": "desconocido", "password": "incorrecta"}).status_code == 422
+
+
+def test_panel_acepta_usuario_sin_arroba(cliente):
+    html = cliente.get("/admin").text
+    assert 'id="correo" type="text"' in html
+    assert "Usuario o correo electrónico" in html
